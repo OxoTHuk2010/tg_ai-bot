@@ -26,6 +26,7 @@ async def get_recommendations_structured(category: str, genre: str, blacklist: l
         max_tokens=900,
     )
     raw = resp.choices[0].message.content
+    print(raw)
     try:
         data = json.loads(raw)
         item = data.get("items", [])
