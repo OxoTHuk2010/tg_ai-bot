@@ -20,7 +20,7 @@ RUN useradd -m -u 10001 appuser
 WORKDIR /app
 
 COPY --from=builder /wheels /wheels
-RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels /wheels/*
+RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt
 
 ENV PIP_NO_CACHE_DIR=1 \
     PYTHONDONTWRITEBYTECODE=1 \
