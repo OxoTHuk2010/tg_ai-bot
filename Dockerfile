@@ -14,7 +14,7 @@ RUN pip install -U pip wheel \
 FROM python:3.12-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates tzdata \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 10001 appuser
 WORKDIR /app
