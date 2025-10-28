@@ -26,12 +26,19 @@ async def reco_set_cat(call: CallbackQuery, state: FSMContext):
 @router.message(RecoStates.waiting_genre)
 async def reco_get(message: Message, state: FSMContext):
     data = await state.get_data()
-    cat = data.get("reco_category", "films")
+    cat = (data.get("reco_category") or "films").strip().lower()
+    genre = message.text.strip().strip('"\u00AB\u00BB“”«»')
     bl = data.get("reco_blacklist", [])
-    genre = message.text.strip()
-    items = await get_recommendations_structured(cat, genre, bl)
+
+    try:
+        items = await get_recommendations_structured(cat, genre, bl)
+        if not items:
+            items = await get_recommendations_structured(cat, genre, bl)
+    except Exception:
+        items = []
+
     if not items:
-        await message.answer("Не удалось сформировать рекомендации. Попробуйте другой жанр.")
+        await message.answer("Не удалось сформировать рекомендации. Попробуйте другой жанр или категорию.")
         return
 
     await state.update_data(reco_genre=genre, reco_items=items)
