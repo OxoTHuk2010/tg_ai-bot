@@ -26,17 +26,18 @@ async def get_recommendations_structured(category: str, genre: str, blacklist: l
         max_tokens=900,
     )
     raw = resp.choices[0].message.content
-    print(raw)
-    try:
-        data = json.loads(raw)
-        item = data.get("items", [])
+    data = json.loads(raw)
+    items = (
+        data.get("items")
+        or data.get("item")
+        or []
+    )
 
-        norm = []
-        for it in item[:5]:
-            norm.append({
-                "title": str(it.get("title","")).strip(),
-                "why": str(it.get("why", "")).strip()
-            })
-        return [x for x in norm if x["title"]]
-    except Exception:
-        return []
+    print(items[0]["title"])
+    norm = []
+    for it in items[:5]:
+        title = str(it.get("title", "")).strip()
+        why = str(it.get("why", "")).strip()
+        if title:
+            norm.append({"title": title, "why": why})
+    return norm[:5]
