@@ -7,7 +7,7 @@ def start_keyboard():
         [InlineKeyboardButton(text='👥 Общение с личностью', callback_data='person_talk')],
         [InlineKeyboardButton(text='🧠 Квиз', callback_data='quiz')],
         [InlineKeyboardButton(text='🌏 Переводчик', callback_data='translate')],
-        [InlineKeyboardButton(text='🎥 Рекомендации', callback_data='recommendation')],
+        [InlineKeyboardButton(text='🎥 Рекомендации', callback_data='recommendations')],
         [InlineKeyboardButton(text='💼 Помощь с резюме', callback_data='resume')],
     ])
 
