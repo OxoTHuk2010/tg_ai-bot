@@ -43,3 +43,38 @@ def quiz_answers():
         [InlineKeyboardButton(text='Смена темы', callback_data='change_topic')],
         [InlineKeyboardButton(text='Закончить игру', callback_data='end_quiz')],
     ])
+
+def translate_lang_keyboard():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Английский", callback_data="lang:английский")],
+        [InlineKeyboardButton(text="Немецкий", callback_data="lang:немецкий")],
+        [InlineKeyboardButton(text="Французский", callback_data="lang:французский")],
+        [InlineKeyboardButton(text="Испанский", callback_data="lang:испанский")],
+        [InlineKeyboardButton(text="Русский", callback_data="lang:русский")],
+    ])
+
+def translate_action_keyboard():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Сменить язык", callback_data="translate_change_lang")],
+        [InlineKeyboardButton(text="Закончить", callback_data="close_to_start")],
+    ])
+
+def reco_category_keyboard():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Фильмы", callback_data="reco_cat:films")],
+        [InlineKeyboardButton(text="Книги", callback_data="reco_cat:books")],
+        [InlineKeyboardButton(text="Музыка", callback_data="reco_cat:music")],
+    ])
+
+def reco_items_keyboard(items):
+    """
+    items: список dict с ключом 'title'. Кнопки "👎 1. <сокр.название>"
+    callback_data: 'reco_dislike:<idx>'
+    """
+    rows = []
+    for i, item in enumerate(items, 1):
+        title = item.get("title", f"#{i}")
+        short = (title[:28] + "…") if len(title) > 29 else title
+        rows.append([InlineKeyboardButton(text=f"👎 {i}. {short}", callback_data=f"reco_dislike:{i}")])
+    rows.append([InlineKeyboardButton(text="Закончить", callback_data="close_to_start")])
+    return InlineKeyboardMarkup(inline_keyboard=rows)

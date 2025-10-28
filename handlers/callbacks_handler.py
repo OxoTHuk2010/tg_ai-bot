@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from services.quiz_manager import init_quiz
+from services.quiz_manager import init_quiz, get_score
 from services.random_fact import get_fact
 from services.quiz_service import get_quiz_question
 from keyboards.inline import fact_keyboard, get_persons_keyboard, get_qviz_keyboard, start_keyboard
@@ -68,3 +68,40 @@ async def quiz_question_handler(call: CallbackQuery, state: FSMContext):
     await state.update_data(question=question, topic=topic, asked_questions=asked)
     await state.set_state(QuizStates.waiting_answer)
     await call.message.answer(f'Тема: {topic}\n\n{question}\n\nВведи свой ответ.')
+
+@router.callback_query(F.data == "next_question")
+async def next_question_handler(call: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    topic = data.get("topic")
+    if not topic:
+        await call.answer("Сначала выберите тему.", show_alert=True)
+        return
+    asked = data.get("asked_questions", [])
+    question = await get_quiz_question(topic, asked)
+    asked.append(question)
+    await state.update_data(question=question, asked_questions=asked)
+    await state.set_state(QuizStates.waiting_answer)
+    await call.message.answer(f'Тема: {topic}\n\n{question}\n\nВведи свой ответ.')
+    await call.answer()
+
+@router.callback_query(F.data == "change_topic")
+async def change_topic_handler(call: CallbackQuery, state: FSMContext):
+    await state.set_state(QuizStates.choosing_topic)
+    await state.update_data(topic=None, question=None, asked_question=[])
+    try:
+        await call.message.edit_reply_markup(reply_markup=None)
+    except TelegramBadRequest:
+        pass
+    await call.message.answer("Выберите новую тему:", reply_markup=get_qviz_keyboard())
+    await call.answer()
+
+@router.callback_query(F.data == "end_quiz")
+async def end_quiz_handler(call: CallbackQuery, state: FSMContext):
+    score = await get_score(state)
+    await state.clear()
+    try:
+        await call.message.edit_reply_markup(reply_markup=None)
+    except TelegramBadRequest:
+        pass
+    await call.message.answer(f"Игра завершена. Итоговый счёт: {score}", reply_markup=start_keyboard())
+    await call.answer("Квиз завершён")

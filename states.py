@@ -18,3 +18,8 @@ class TranslateStates(StatesGroup):
 class RecoStates(StatesGroup):
     choosing_category = State()
     waiting_genre = State()
+
+class ResumeStates(StatesGroup):
+    collecting_education = State()
+    collecting_experience = State()
+    collecting_skills = State()
